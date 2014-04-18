@@ -71,7 +71,7 @@ def refactor (content_pairs):
 
 
 def high_level_summary (root_dir=os.getcwd()):
-  summaries = defaultdict(lambda: {})
+  summaries, root_len = project_structure(root_dir)
   for dir_path, subdirs, files in os.walk(root_dir, topdown=False):
     if '.' in dir_path: continue # prevents .dirs like .git/
 
@@ -79,24 +79,35 @@ def high_level_summary (root_dir=os.getcwd()):
     print dir_path
     print '============'
 
+    s = nested(dir_path.split('/')[root_len:], summaries)
     for f in files:
       if f[0] == '.': continue # prevents dotfiles like .gitignore or .foo.py.swp
 
       print '****' + f + '****'
-      summaries[dir_path][f] = raw_input('Your summary: ')
-
-    summaries[dir_path]['subdirs'] = subdirs
-    summaries[dir_path]['dir_summary'] = raw_input('\nSummary of the subdirectory: ')
+      s[f] = raw_input('Your summary: ')
+    s['dir_summary'] = raw_input('\nSummary of the subdirectory: ')
 
   print json.dumps(summaries, indent=2)
   return summaries
 
+def project_structure (root_dir):
+  project = {}
+  root_len = len(root_dir.split('/')) - 1
+  for dir_path, subdirs, files in os.walk(root_dir):
+    if '.' in dir_path: continue
+    dir_path = dir_path.split('/')[root_len:]
+    nested_dict = nested(dir_path, project, exclude_last=True)
+    nested_dict[dir_path[-1]] = {}
+  return project, root_len
 
+def nested (subdirs, p_dict, exclude_last=False):
+  p = p_dict
+  if exclude_last: subdirs = subdirs[:-1]
+  for sd in subdirs:
+    p = p[sd]
+  return p
 
 def run ():
-  #content_pairs = get_answers(process_project(sys.argv[1]))
-  #test_understanding(content_pairs)
-  #content_trio = refactor(content_pairs)
   high_level_summary()
 
 if __name__ == '__main__':
