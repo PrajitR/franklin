@@ -1,5 +1,8 @@
 import sys
+import os
 from random import shuffle
+from collections import defaultdict
+import json
 
 def process_project (filename):
   content = ''
@@ -19,7 +22,7 @@ def get_answers (contents):
     print '\n'
   return content_pairs
 
-def testUnderstanding (content_pairs):
+def test_understanding (content_pairs):
   shuffle(content_pairs)
   correct, wrong = 0, 0
 
@@ -28,11 +31,11 @@ def testUnderstanding (content_pairs):
     print func
     raw_input('')
     print 'Answer: ' + answer
-    userCorrect = raw_input('Did you get it correct? (y/n) -> ')[0]
+    user_correct = raw_input('Did you get it correct? (y/n) -> ')[0]
     while not (userCorrect == 'y' or userCorrect == 'n'):
-      userCorrect = raw_input('Did you get it correct? (y/n) -> ')[0]
+      user_correct = raw_input('Did you get it correct? (y/n) -> ')[0]
     
-    if userCorrect == 'y': correct += 1
+    if user_correct == 'y': correct += 1
     else: wrong += 1
     
     print '\n'
@@ -66,10 +69,35 @@ def refactor (content_pairs):
 
   return content_trio
 
+
+def high_level_summary (root_dir=os.getcwd()):
+  summaries = defaultdict(lambda: {})
+  for dir_path, subdirs, files in os.walk(root_dir, topdown=False):
+    if '.' in dir_path: continue # prevents .dirs like .git/
+
+    print '\n\n============'
+    print dir_path
+    print '============'
+
+    for f in files:
+      if f[0] == '.': continue # prevents dotfiles like .gitignore or .foo.py.swp
+
+      print '****' + f + '****'
+      summaries[dir_path][f] = raw_input('Your summary: ')
+
+    summaries[dir_path]['subdirs'] = subdirs
+    summaries[dir_path]['dir_summary'] = raw_input('\nSummary of the subdirectory: ')
+
+  print json.dumps(summaries, indent=2)
+  return summaries
+
+
+
 def run ():
-  content_pairs = get_answers(process_project(sys.argv[1]))
-  testUnderstanding(content_pairs)
-  content_trio = refactor(content_pairs)
+  #content_pairs = get_answers(process_project(sys.argv[1]))
+  #test_understanding(content_pairs)
+  #content_trio = refactor(content_pairs)
+  high_level_summary()
 
 if __name__ == '__main__':
   run()
