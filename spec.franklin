@@ -1,0 +1,98 @@
+# JSON object with keys as folder names that you would like to expand on
+# Each key will represent a separate tree to explore
+# The tree that encompasses the entire project MUST be called 'project_root'
+# If if a folder is enumerated here, it will be clickable in any tree (which
+#     will bring it to the clicked folder's tree)
+
+# For each folder:
+# JSON objects with keys as file/subfolder names
+# If the key is a folder, it MUST end with a '/' (ex. 'src/')
+# Each key has an object the has the keys: 'description', 'next',
+#                                          and optionally 'entry_point'
+# 'description': (string) A description of a file or folder
+# 'next': (array of strings) Having read the current file/folder, 
+#         what files/folders should be read next?
+# 'entry_point': (boolean) Designates a file/folder as a valid entry point.
+#                Defaults to false. Can have multiple entry points.                  
+
+{
+  'project_root': {
+    'foldername/': {
+      description: '',
+      next: []
+    },
+    'file1': {
+      description: '',
+      next: ['foldername/'],
+      entry_point: true
+    }
+  },
+
+  'foldername/': {
+    'file2': {
+      description: '',
+      next: ['file3'],
+      entry_point: true
+    },
+    'file3': {
+      description: '',
+      next: []
+    }
+  }
+}
+
+===========
+Example
+===========
+{
+  'project_root': {
+    'core/': {
+      description: 'Holds the core logic of the project',
+      next: ['array/', 'math/']
+    },
+    'array/': {
+      description: 'Various array helper functions',
+      next: ['math/', 'events/']
+    },
+    'math/': {
+      description: 'Various math helper functions',
+      next: ['array/', 'events/']
+    },
+    'events/': {
+      description: 'Handles events',
+      next: []
+    },
+    'index.js': {
+      description: 'Main file',
+      next: ['core/'],
+      entry_point: true
+    }
+  },
+
+  'core/': {
+    'document.js': {
+      description: 'Initializes DOM elements',
+      next: ['class.js', 'source.js', 'vendor.js'],
+      entry_point: true
+    },
+    'index.js': {
+      description: 'Handles basic imports',
+      next: ['document.js', 'source.js', 'class.js', 'vendor.js']
+      entry_point: true
+    },
+    'source.js': {
+      description: 'Returns the source of an object',
+      next: ['target.js']
+    },
+    'class.js': {
+      description: 'Extends a class',
+      next: ['subclass.js']
+    },
+    .
+    .
+    .
+  },
+  .
+  .
+  .
+}
