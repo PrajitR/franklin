@@ -8,12 +8,31 @@
       stroke: #9ecae1;
       stroke-width: 1.5px;
     }
+
+    .node rect {
+      stroke: #333;
+      stroke-width: 1.5px;
+      fill: #fff;
+    }
+
+    .edgeLabel rect {
+      fill: #fff;
+    }
+
+    .edgePath {
+      stroke: #333;
+      stroke-width: 1.5px;
+      fill: none;
+    }
   </style>
 </head>
 <body>
-  <button id="back">Back</button>
   <svg id="chart"></svg>
+  <br>
+  <button id="back">Back</button>
+  <p id="description"></p>
   <script src="lib/d3.js" charset="utf-8"></script>
+  <script src="lib/dagre.js" charset="utf-8"></script>
   <script src="franklin.js"></script>
 </body>
 </html>
