@@ -1,5 +1,5 @@
 {
-  "project_root": {
+  "/": {
     "core/": {
       "description": "Holds the core logic of the project",
       "next": ["array/", "math/"]

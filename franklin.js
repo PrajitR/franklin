@@ -14,9 +14,9 @@ var data, root, prevFolder = [],
 d3.select('button#back')
     .on('click', gotoPreviousFolder);
 
-d3.json('test/example.franklin', function (error, _data) {
+d3.json('test/d3.franklin', function (error, _data) {
   data = _data;
-  root = 'project_root';
+  root = '/';
   createDagre(data[root]);
 });
 
@@ -66,9 +66,9 @@ function flatten(obj) {
 
 function handleClick(name) {
   if (d3.event.defaultPrevented) return;
-  if (data[name]) {
+  if (data[root + name]) {
     prevFolder.push(root);
-    root = name;
+    root = root + name;
     createDagre(data[root]);
   }
 }
@@ -78,7 +78,6 @@ function updateDescription(des) {
 }
 
 function gotoPreviousFolder(d) {
-  console.log('ay');
   var folder = prevFolder.pop();
   if (folder) {
     root = folder;
