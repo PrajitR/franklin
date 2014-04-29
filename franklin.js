@@ -14,12 +14,16 @@ var data,
     description = d3.select('p#description');
  
 var editing = false,
-    sourceNode = null;
+    sourceNode = null,
+    specialAction = null;
 
 d3.select('button#back')
     .on('click', gotoPreviousFolder);
 d3.select('button#toggleEdit')
     .on('click', toggleEdit);
+d3.select(document)
+    .on('keydown', handleKeyDown)
+    .on('keyup', handleKeyUp);
 
 d3.json('test/d3.franklin', function (error, _data) {
   data = _data;
@@ -79,16 +83,25 @@ function handleClick(name) {
     root += name;
     createDagre(data[root]);
   } else if (editing) {
-    handleEdit(name);
+    editGraph(name);
   }
 }
 
-function handleEdit(name) {
+function editGraph(name) {
   if (sourceNode && sourceNode != name) {
-    data[root][sourceNode].next.push(name);
+    if (specialAction == 'removeLink') {
+      var n = data[root][sourceNode];
+      n.next = n.next.filter(function(f) { return f != name; });
+    } else {
+      data[root][sourceNode].next.push(name);
+    }
+
     d3.select('#franklin-' + cleanHtmlId(sourceNode))
-        .style('stroke', null);
+          .style('stroke', null);
     sourceNode = null;
+    createDagre(data[root]);
+  } else if (specialAction == 'deleteNode') {
+    delete data[root][name];
     createDagre(data[root]);
   } else {
     sourceNode = name;
@@ -96,7 +109,6 @@ function handleEdit(name) {
         .style('stroke', '#e22121');
   }
 }
-
 
 function updateDescription(des) {
   description.html(des);
@@ -118,5 +130,23 @@ function gotoPreviousFolder(e) {
 function toggleEdit(e) {
   editing = !editing;
   d3.select('button#toggleEdit').html(editing ? 'Explore' : 'Edit');
-  selectNode = null;
+  if (sourceNode) {
+    d3.select('#franklin-' + cleanHtmlId(sourceNode))
+        .style('stroke', null);
+  }
+  sourceNode = null;
 }
+
+function handleKeyDown() {
+  if (specialAction) return;
+  var e = d3.event.keyCode;
+  if (e == 68) { specialAction = 'deleteNode'; } // 'd'
+  else if (e == 82) { specialAction = 'removeLink'; } // 'r'
+}
+
+function handleKeyUp() {
+  var e = d3.event.keyCode;
+  if (e == 68 && specialAction == 'deleteNode') { specialAction = null; } // 'd'
+  else if (e == 82 && specialAction == 'removeLink')  { specialAction = null; } // 'r'
+}
+
