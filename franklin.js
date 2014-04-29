@@ -1,6 +1,6 @@
 var margin = {top: 20, right: 30, bottom: 30, left: 40},
-    width = 960 - margin.left - margin.right,
-    height = 500 - margin.top - margin.bottom;
+    width = window.innerWidth - margin.left - margin.right,
+    height = window.innerHeight - margin.top - margin.bottom - 100;
 
 var svg = d3.select('svg#chart')
     .attr('width', width + margin.left + margin.right)
@@ -8,11 +8,18 @@ var svg = d3.select('svg#chart')
   .append('g')
     .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
-var data, root, prevFolder = [],
+var data, 
+    root, 
+    prevFolder = [],
     description = d3.select('p#description');
+ 
+var editing = false,
+    sourceNode = null;
 
 d3.select('button#back')
     .on('click', gotoPreviousFolder);
+d3.select('button#toggleEdit')
+    .on('click', toggleEdit);
 
 d3.json('test/d3.franklin', function (error, _data) {
   data = _data;
@@ -46,6 +53,7 @@ function createDagre(root) {
         .attr('style', function (u) {
           if (g.node(u).entry_point) return 'fill: #ffd0cd';
         })
+        .attr('id', function (u) { return 'franklin-' + cleanHtmlId(g.node(u).label); })
         .on('click', function (u) { handleClick(g.node(u).label); })
         .on('mouseover', function (u) { updateDescription(g.node(u).description); });
     return svgNodes;
@@ -66,21 +74,49 @@ function flatten(obj) {
 
 function handleClick(name) {
   if (d3.event.defaultPrevented) return;
-  if (data[root + name]) {
+  if (!editing && data[root + name]) {
     prevFolder.push(root);
-    root = root + name;
+    root += name;
     createDagre(data[root]);
+  } else if (editing) {
+    handleEdit(name);
   }
 }
+
+function handleEdit(name) {
+  if (sourceNode && sourceNode != name) {
+    data[root][sourceNode].next.push(name);
+    d3.select('#franklin-' + cleanHtmlId(sourceNode))
+        .style('stroke', null);
+    sourceNode = null;
+    createDagre(data[root]);
+  } else {
+    sourceNode = name;
+    d3.select('#franklin-' + cleanHtmlId(sourceNode))
+        .style('stroke', '#e22121');
+  }
+}
+
 
 function updateDescription(des) {
   description.html(des);
 }
 
-function gotoPreviousFolder(d) {
+function cleanHtmlId(id) {
+  // Replace "/" or "." with "-".
+  return id.replace(/\/|\./, '-');
+}
+
+function gotoPreviousFolder(e) {
   var folder = prevFolder.pop();
   if (folder) {
     root = folder;
     createDagre(data[root]);
   }
+}
+
+function toggleEdit(e) {
+  editing = !editing;
+  d3.select('button#toggleEdit').html(editing ? 'Explore' : 'Edit');
+  selectNode = null;
 }
