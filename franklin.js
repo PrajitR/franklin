@@ -15,7 +15,8 @@ var data,
  
 var editing = false,
     sourceNode = null,
-    specialAction = null;
+    specialAction = null,
+    connectingLine = null;
 
 d3.select('button#back')
     .on('click', gotoPreviousFolder);
@@ -23,7 +24,8 @@ d3.select('button#toggleEdit')
     .on('click', toggleEdit);
 d3.select(document)
     .on('keydown', handleKeyDown)
-    .on('keyup', handleKeyUp);
+    .on('keyup', handleKeyUp)
+    .on('mousemove', moveConnectingLine);
 
 d3.json('test/d3.franklin', function (error, _data) {
   data = _data;
@@ -102,18 +104,17 @@ function editGraph(name) {
     } else {
       data[root][sourceNode].next.push(name);
     }
-
-    d3.select('#franklin-' + cleanHtmlId(sourceNode))
-          .style('stroke', null);
-    sourceNode = null;
+    cleanup();
     createDagre(data[root]);
   } else if (specialAction == 'deleteNode') {
     delete data[root][name];
+    cleanup();
     createDagre(data[root]);
   } else {
     sourceNode = name;
-    d3.select('#franklin-' + cleanHtmlId(sourceNode))
+    var selected = d3.select('#franklin-' + cleanHtmlId(sourceNode))
         .style('stroke', '#e22121');
+    createConnectLine(selected.node().parentNode);
   }
 }
 
@@ -137,11 +138,32 @@ function gotoPreviousFolder(e) {
 function toggleEdit(e) {
   editing = !editing;
   d3.select('button#toggleEdit').html(editing ? 'Explore' : 'Edit');
+  cleanup();
+}
+
+function createConnectLine(selected) {
+  connectingLine = d3.select(selected).append('line')
+      .attr({ x1: 0, y1: 0,
+              stroke: 'black', 'stroke-width': 2
+            });
+}
+
+function cleanup() {
+  if (connectingLine) { connectingLine.remove(); }
   if (sourceNode) {
     d3.select('#franklin-' + cleanHtmlId(sourceNode))
         .style('stroke', null);
   }
+  connectingLine = null; 
   sourceNode = null;
+}
+
+function moveConnectingLine() {
+  if (connectingLine) {
+    var xy = d3.mouse(connectingLine.node()),
+        padding = 5;
+    connectingLine.attr({ x2: xy[0] - padding, y2: xy[1] - padding });
+  }
 }
 
 function handleKeyDown() {
