@@ -171,6 +171,7 @@ function handleKeyDown() {
   var e = d3.event.keyCode;
   if (e == 68) { specialAction = 'deleteNode'; } // 'd'
   else if (e == 82) { specialAction = 'removeLink'; } // 'r'
+  else if (e == 81) { cleanup(); } // 'q'
 }
 
 function handleKeyUp() {
