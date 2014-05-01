@@ -29,7 +29,7 @@ d3.select(document)
     .on('keyup', handleKeyUp)
     .on('mousemove', moveConnectingLine);
 
-d3.json('test/d3.franklin', function (error, _data) {
+d3.json('franklin.json', function (error, _data) {
   data = _data;
   root = '/';
   createDagre(data[root]);
@@ -168,12 +168,22 @@ function moveConnectingLine() {
   }
 }
 
+function saveData() {
+  d3.xhr('/')
+      .header('Content-Type', 'application/json')
+      .post(JSON.stringify(data), function (error, data) {
+        if (error) console.error('Error: ' + error);
+        else console.log('Successfully saved data!');
+      });
+}
+
 function handleKeyDown() {
   if (specialAction) return;
   var e = d3.event.keyCode;
   if (e == KEYS.d) { specialAction = 'deleteNode'; }
   else if (e == KEYS.r) { specialAction = 'removeLink'; }
   else if (e == KEYS.q) { cleanup(); }
+  else if (e == KEYS.p) { saveData(); }
 }
 
 function handleKeyUp() {
