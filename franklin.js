@@ -18,6 +18,8 @@ var editing = false,
     specialAction = null,
     connectingLine = null;
 
+var KEYS = { d: 68, r: 82, q: 81, p: 80 };
+
 d3.select('button#back')
     .on('click', gotoPreviousFolder);
 d3.select('button#toggleEdit')
@@ -169,14 +171,14 @@ function moveConnectingLine() {
 function handleKeyDown() {
   if (specialAction) return;
   var e = d3.event.keyCode;
-  if (e == 68) { specialAction = 'deleteNode'; } // 'd'
-  else if (e == 82) { specialAction = 'removeLink'; } // 'r'
-  else if (e == 81) { cleanup(); } // 'q'
+  if (e == KEYS.d) { specialAction = 'deleteNode'; }
+  else if (e == KEYS.r) { specialAction = 'removeLink'; }
+  else if (e == KEYS.q) { cleanup(); }
 }
 
 function handleKeyUp() {
   var e = d3.event.keyCode;
-  if (e == 68 && specialAction == 'deleteNode') { specialAction = null; } // 'd'
-  else if (e == 82 && specialAction == 'removeLink')  { specialAction = null; } // 'r'
+  if (e == KEYS.d && specialAction == 'deleteNode') { specialAction = null; }
+  else if (e == KEYS.r && specialAction == 'removeLink')  { specialAction = null; }
 }
 
