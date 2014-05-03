@@ -11,19 +11,22 @@ var chart = d3.select('svg#chart')
 var data, 
     root, 
     prevFolder = [],
-    description = d3.select('p#description');
+    description = d3.select('p#description'),
+    editDescription = d3.select('div#edit-description');
  
 var editing = false,
     sourceNode = null,
     specialAction = null,
     connectingLine = null;
 
-var KEYS = { d: 68, r: 82, q: 81, s: 83, b: 66, e: 69 };
+var KEYS = { d: 68, r: 82, q: 81, s: 83, b: 66, e: 69, c: 67};
 
 d3.select(document)
     .on('keydown', handleKeyDown)
     .on('keyup', handleKeyUp)
     .on('mousemove', moveConnectingLine);
+editDescription.select('button')
+    .on('click', submitDescription);
 
 d3.json('franklin.json', function (error, _data) {
   data = _data;
@@ -31,9 +34,9 @@ d3.json('franklin.json', function (error, _data) {
   createDagre(data[root]);
 });
 
-function createDagre(root) {
+function createDagre(graph) {
   var g = new dagreD3.Digraph(),
-      nodes = flatten(root);
+      nodes = flatten(graph);
 
   // Nodes
   nodes.forEach(function (d) {
@@ -58,7 +61,7 @@ function createDagre(root) {
           if (g.node(u).entry_point) return 'fill: #ffd0cd';
         })
         .attr('id', function (u) { return 'franklin-' + cleanHtmlId(g.node(u).label); })
-        .on('click', function (u) { handleClick(g.node(u).label); })
+        .on('click', function (u) { handleClick(g.node(u)); })
         .on('mouseover', function (u) { updateDescription(g.node(u).description); });
     return svgNodes;
   });
@@ -83,18 +86,20 @@ function flatten(obj) {
   return nodes;
 };
 
-function handleClick(name) {
+function handleClick(node) {
   if (d3.event.defaultPrevented) return;
+  var name = node.label;
   if (!editing && data[root + name]) {
     prevFolder.push(root);
     root += name;
     createDagre(data[root]);
   } else if (editing) {
-    editGraph(name);
+    editGraph(node);
   }
 }
 
-function editGraph(name) {
+function editGraph(node) {
+  var name = node.label;
   if (sourceNode && sourceNode != name) {
     if (specialAction == 'removeLink') {
       var n = data[root][sourceNode];
@@ -112,12 +117,30 @@ function editGraph(name) {
     sourceNode = name;
     var selected = d3.select('#franklin-' + cleanHtmlId(sourceNode))
         .style('stroke', '#e22121');
-    createConnectLine(selected.node().parentNode);
+    if (specialAction == 'editDescription') {
+      editDescription.style('visibility', 'visible');
+      editDescription.select('label').html(sourceNode);
+      editDescription.select('textarea').html(node.description);
+    } else {
+      createConnectLine(selected.node().parentNode);
+    }
   }
 }
 
 function updateDescription(des) {
   description.html(des);
+}
+
+function submitDescription() {
+  var name = editDescription.select('label').html(),
+      desc = editDescription.select('textarea').node().value;
+  data[root][name].description = desc;
+  
+  editDescription.style('visibility', 'hidden');
+  editDescription.select('textarea').node().value = '';
+  specialAction = null;
+  cleanup();
+  createDagre(data[root]);
 }
 
 function cleanHtmlId(id) {
@@ -178,6 +201,7 @@ function handleKeyDown() {
   var e = d3.event.keyCode;
   if      (e == KEYS.d) { specialAction = 'deleteNode'; }
   else if (e == KEYS.r) { specialAction = 'removeLink'; }
+  else if (e == KEYS.c) { specialAction = 'editDescription'; }
   else if (e == KEYS.q) { cleanup(); }
   else if (e == KEYS.s) { saveData(); }
   else if (e == KEYS.e) { toggleEdit(); }
@@ -188,5 +212,6 @@ function handleKeyUp() {
   var e = d3.event.keyCode;
   if (e == KEYS.d && specialAction == 'deleteNode') { specialAction = null; }
   else if (e == KEYS.r && specialAction == 'removeLink')  { specialAction = null; }
+  else if (e == KEYS.c && !sourceNode) { specialAction = null; }
 }
 
