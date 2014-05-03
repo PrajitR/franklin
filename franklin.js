@@ -18,12 +18,8 @@ var editing = false,
     specialAction = null,
     connectingLine = null;
 
-var KEYS = { d: 68, r: 82, q: 81, p: 80 };
+var KEYS = { d: 68, r: 82, q: 81, s: 83, b: 66, e: 69 };
 
-d3.select('button#back')
-    .on('click', gotoPreviousFolder);
-d3.select('button#toggleEdit')
-    .on('click', toggleEdit);
 d3.select(document)
     .on('keydown', handleKeyDown)
     .on('keyup', handleKeyUp)
@@ -129,7 +125,7 @@ function cleanHtmlId(id) {
   return id.replace(/\/|\./g, '-');
 }
 
-function gotoPreviousFolder(e) {
+function gotoPreviousFolder() {
   var folder = prevFolder.pop();
   if (folder) {
     root = folder;
@@ -137,9 +133,9 @@ function gotoPreviousFolder(e) {
   }
 }
 
-function toggleEdit(e) {
+function toggleEdit() {
   editing = !editing;
-  d3.select('button#toggleEdit').html(editing ? 'Explore' : 'Edit');
+  console.log(editing ? 'Explore' : 'Edit');
   cleanup();
 }
 
@@ -180,10 +176,12 @@ function saveData() {
 function handleKeyDown() {
   if (specialAction) return;
   var e = d3.event.keyCode;
-  if (e == KEYS.d) { specialAction = 'deleteNode'; }
+  if      (e == KEYS.d) { specialAction = 'deleteNode'; }
   else if (e == KEYS.r) { specialAction = 'removeLink'; }
   else if (e == KEYS.q) { cleanup(); }
-  else if (e == KEYS.p) { saveData(); }
+  else if (e == KEYS.s) { saveData(); }
+  else if (e == KEYS.e) { toggleEdit(); }
+  else if (e == KEYS.b) { gotoPreviousFolder(); }
 }
 
 function handleKeyUp() {
