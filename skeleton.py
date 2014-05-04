@@ -1,3 +1,4 @@
+import sys
 import json
 import os
 import itertools
@@ -25,5 +26,6 @@ def valid_file (f):
   return not any(inv in f for inv in restricted)
 
 if __name__ == '__main__':
-  
-  print json.dumps(generate_structure('/home/prajit/d3'), indent=2)
+  file_name = sys.argv[1] or 'franklin.json'  
+  with open(file_name, 'w') as f:
+    json.dump(generate_structure(), f)
