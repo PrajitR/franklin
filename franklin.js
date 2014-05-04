@@ -4,7 +4,7 @@ var margin = {top: 20, right: 30, bottom: 30, left: 40},
 
 var chart = d3.select('svg#chart')
     .attr('width', width + margin.left + margin.right),
-    //.attr('height', height + margin.top + margin.bottom)
+    .attr('height', height + margin.top + margin.bottom)
     svg = chart.append('g')
     .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
@@ -70,9 +70,10 @@ function createDagre(graph) {
   renderer.transition(function (selection) { return selection.transition().duration(500); });
   layout = renderer.layout(layout).run(g, svg);
 
-  var ypos = [];
-  layout.eachNode(function (u, value) { ypos.push(value.y); });
-  chart.attr('height', d3.max(ypos) + 100);
+  var ypos = [], xpos = [], padding = 100;
+  layout.eachNode(function (u, value) { xpos.push(value.x); ypos.push(value.y); });
+  chart.attr('width' , d3.max(xpos) + padding);
+  chart.attr('height', d3.max(ypos) + padding);
 }
 
 function flatten(obj) {
