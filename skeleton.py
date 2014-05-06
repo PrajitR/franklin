@@ -36,6 +36,13 @@ def valid_dir (d):
   return not any(inv in d for inv in restricted)
 
 if __name__ == '__main__':
-  file_name = sys.argv[1] or 'franklin.json'  
+  file_name, root_dir = 'franklin.json', os.getcwd()
+  for i in xrange(1, len(sys.argv), 2):
+    option = sys.argv[i]
+    if option == '-p' or option == '--projectpath':
+      root_dir = sys.argv[i + 1]
+    elif option == '-o' or option == '--output':
+      file_name = sys.argv[i + 1]
+
   with open(file_name, 'w') as f:
-    json.dump(generate_structure(), f)
+    json.dump(generate_structure(root_dir), f)
