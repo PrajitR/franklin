@@ -44,5 +44,10 @@ if __name__ == '__main__':
     elif option == '-o' or option == '--output':
       file_name = sys.argv[i + 1]
 
+  if os.path.isfile(file_name):
+    r = raw_input(file_name + ' already exists! Do you want to continue? (y/n)')
+    if r[0] != 'y' or r[0] != 'Y':
+      return
+
   with open(file_name, 'w') as f:
     json.dump(generate_structure(root_dir), f)
