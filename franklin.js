@@ -84,6 +84,7 @@ function flatten(obj) {
     value.id = ++i;
     nodes.push(value);
   });
+  nodes.sort(function (a, b) { return d3.descending(a.next.length, b.next.length); });
   return nodes;
 };
 
