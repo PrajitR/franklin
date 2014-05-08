@@ -3,26 +3,20 @@
 <head>
   <title>Franklin</title>
   <style>
-    svg {
-      overflow: scroll;
-    }
-
+    /* Taken from DagreD3's tutorial. */
     line.link {
       fill: none;
       stroke: #9ecae1;
       stroke-width: 1.5px;
     }
-
     .node rect {
       stroke: #333;
       stroke-width: 1.5px;
       fill: #fff;
     }
-
     .edgeLabel rect {
       fill: #fff;
     }
-
     .edgePath {
       stroke: #333;
       stroke-width: 1.5px;
@@ -33,11 +27,13 @@
 <body>
   <svg id="chart"></svg>
   <br>
-  <p id="description">Description:</p>
-  <div id="edit-description" style="visibility: hidden">
-    <label></label>
-    <textarea></textarea>
-    <button>Save</button>
+  <div id='content'>
+    <p id="description"></p>
+    <div id="edit-description" style="visibility: hidden">
+      <label></label>
+      <textarea></textarea>
+      <button>Save</button>
+    </div>
   </div>
   <script src="lib/d3.js" charset="utf-8"></script>
   <script src="lib/dagre.js" charset="utf-8"></script>
