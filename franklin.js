@@ -18,7 +18,7 @@ var editing = false,
     specialAction = null,
     connectingLine = null;
 
-var KEYS = { d: 68, r: 82, q: 81, s: 83, b: 66, e: 69, c: 67};
+var KEYS = { d: 68, r: 82, q: 81, s: 83, b: 66, e: 69, c: 67, p: 80};
 
 d3.select(document)
     .on('keydown', handleKeyDown)
@@ -115,6 +115,10 @@ function editGraph(node) {
     delete data[root][name];
     cleanup();
     createDagre(data[root]);
+  } else if (specialAction == 'createEntry') {
+    data[root][name].entry_point = !data[root][name].entry_point;
+    cleanup();
+    createDagre(data[root]);
   } else {
     sourceNode = name;
     var selected = d3.select('#franklin-' + cleanHtmlId(sourceNode))
@@ -199,6 +203,7 @@ function handleKeyDown() {
   if      (e == KEYS.d) { specialAction = 'deleteNode'; }
   else if (e == KEYS.r) { specialAction = 'removeLink'; }
   else if (e == KEYS.c) { specialAction = 'editDescription'; }
+  else if (e == KEYS.p) { specialAction = 'createEntry'; }
   else if (e == KEYS.q) { cleanup(); }
   else if (e == KEYS.s) { saveData(); }
   else if (e == KEYS.e) { toggleEdit(); }
@@ -209,6 +214,7 @@ function handleKeyUp() {
   var e = d3.event.keyCode;
   if (e == KEYS.d && specialAction == 'deleteNode') { specialAction = null; }
   else if (e == KEYS.r && specialAction == 'removeLink')  { specialAction = null; }
+  else if (e == KEYS.p && specialAction == 'createEntry') { specialAction = null; }
   else if (e == KEYS.c && !sourceNode) { specialAction = null; }
 }
 
