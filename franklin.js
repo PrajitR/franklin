@@ -11,14 +11,15 @@ var chart = d3.select('svg#chart')
 var data, 
     root, 
     prevFolder = [],
-    editDescription = d3.select('div#edit-description');
+    editDescription = d3.select('div#edit-description'),
+    helpSheet = d3.select('ul#help-sheet');
  
 var editing = false,
     sourceNode = null,
     specialAction = null,
     connectingLine = null;
 
-var KEYS = { d: 68, r: 82, q: 81, s: 83, b: 66, e: 69, c: 67, p: 80};
+var KEYS = { d: 68, r: 82, q: 81, s: 83, b: 66, e: 69, c: 67, p: 80, questionmark: 191 };
 
 d3.select(document)
     .on('keydown', handleKeyDown)
@@ -197,6 +198,11 @@ function saveData() {
       });
 }
 
+function toggleHelpSheet() {
+  var visible = helpSheet.style('visibility');
+  helpSheet.style('visibility', visible == 'visible' ? 'hidden' : 'visible');
+}
+
 function handleKeyDown() {
   if (specialAction) return;
   var e = d3.event.keyCode;
@@ -208,6 +214,7 @@ function handleKeyDown() {
   else if (e == KEYS.s) { saveData(); }
   else if (e == KEYS.e) { toggleEdit(); }
   else if (e == KEYS.b) { gotoPreviousFolder(); }
+  else if (e == KEYS.questionmark) { toggleHelpSheet(); }
 }
 
 function handleKeyUp() {

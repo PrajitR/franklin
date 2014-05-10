@@ -22,18 +22,37 @@
       stroke-width: 1.5px;
       fill: none;
     }
+    #edit-description {
+      visibility: hidden;
+    }
+    ul#help-sheet {
+      visibility: hidden;
+      position: fixed;
+      width: 80%;
+      height: 80%;
+    }
   </style>
 </head>
 <body>
   <svg id="chart"></svg>
   <br>
   <div id='content'>
-    <p id="description"></p>
-    <div id="edit-description" style="visibility: hidden">
+    <div id="edit-description">
       <label></label>
       <textarea></textarea>
       <button>Save</button>
     </div>
+    <ul id="help-sheet">
+      <li> e: toggle edit mode (default off) </li>
+      <li> d: delete node </li>
+      <li> r: remove link between nodes </li>
+      <li> q: unfocus node </li>
+      <li> s: save layout </li>
+      <li> b: up one layer (non-edit mode) </li>
+      <li> c: change description of node </li>
+      <li> p: toggle entry point property of node </li>
+      <li> ?: open/close help menu </li>
+    </ul>
   </div>
   <script src="lib/d3.js" charset="utf-8"></script>
   <script src="lib/dagre.js" charset="utf-8"></script>
