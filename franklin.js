@@ -17,9 +17,10 @@ var data,
 var editing = false,
     sourceNode = null,
     specialAction = null,
-    connectingLine = null;
+    connectingLine = null,
+    undo = [];
 
-var KEYS = { d: 68, r: 82, q: 81, s: 83, b: 66, e: 69, c: 67, p: 80, questionmark: 191 };
+var KEYS = { d: 68, r: 82, q: 81, s: 83, b: 66, e: 69, c: 67, p: 80, u: 85, questionmark: 191 };
 
 d3.select(document)
     .on('keydown', handleKeyDown)
@@ -107,12 +108,18 @@ function editGraph(node) {
     if (specialAction == 'removeLink') {
       var n = data[root][sourceNode];
       n.next = n.next.filter(function(f) { return f != name; });
+      undo.push({ source: sourceNode, name: name });
+      undo.push('removeLink');
     } else {
       data[root][sourceNode].next.push(name);
+      undo.push({ source: sourceNode, name: name });
+      undo.push('addLink');
     }
     cleanup();
     createDagre(data[root]);
   } else if (specialAction == 'deleteNode') {
+    undo.push(data[root][name]);
+    undo.push('deleteNode');
     delete data[root][name];
     cleanup();
     createDagre(data[root]);
@@ -131,6 +138,26 @@ function editGraph(node) {
     } else {
       createConnectLine(selected.node().parentNode);
     }
+  }
+}
+
+function undoAction() {
+  if (undo.length < 2) { return; }
+  var action = undo[undo.length - 1],
+      undoData = undo[undo.length - 2];
+  if (action == 'deleteNode') {
+    data[root][undoData.name] = undoData;
+    undo.pop(); undo.pop();
+    createDagre(data[root]);
+  } else if (action == 'removeLink') {
+    data[root][undoData.source].next.push(undoData.name);
+    undo.pop(); undo.pop();
+    createDagre(data[root]);
+  } else if (action == 'addLink') {
+    var n = data[root][undoData.source];
+    n.next = n.next.filter(function(f) { return f != undoData.name; });
+    undo.pop(); undo.pop();
+    createDagre(data[root]);
   }
 }
 
@@ -214,6 +241,7 @@ function handleKeyDown() {
   else if (e == KEYS.s) { saveData(); }
   else if (e == KEYS.e) { toggleEdit(); }
   else if (e == KEYS.b) { gotoPreviousFolder(); }
+  else if (e == KEYS.u) { undoAction(); }
   else if (e == KEYS.questionmark) { toggleHelpSheet(); }
 }
 
