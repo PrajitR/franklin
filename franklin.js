@@ -8,7 +8,8 @@ var chart = d3.select('svg#chart')
     svg = chart.append('g')
     .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
-var data, // Entire JSON object.
+var file, // File to read data from.
+    data, // Entire JSON object.
     root, // Current folder being observed.
     editDescription = d3.select('div#edit-description'),
     helpSheet = d3.select('ul#help-sheet');
@@ -30,11 +31,14 @@ d3.select(document)
 editDescription.select('button')
     .on('click', submitDescription);
 
-d3.json('franklin.json', function (error, _data) {
-  data = _data;
-  root = '/';
-  createDagre(data[root]);
-});
+function renderGraphFromFile(_file) {
+  file = _file;
+  d3.json(file, function (error, _data) {
+    data = _data;
+    root = '/';
+    createDagre(data[root]);
+  });
+}
 
 function createDagre(graph) {
   var g = new dagreD3.Digraph(),
@@ -272,4 +276,3 @@ function handleKeyUp() {
   else if (e == KEYS.p && specialAction == 'createEntry') { specialAction = null; }
   else if (e == KEYS.c && !sourceNode) { specialAction = null; }
 }
-
