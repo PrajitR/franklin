@@ -1,3 +1,7 @@
+!function() {
+
+var franklin = {};
+
 var margin = { top: 20, right: 30, bottom: 30, left: 40 },
     width = window.innerWidth - margin.left - margin.right,
     height = window.innerHeight - margin.top - margin.bottom - 100;
@@ -32,7 +36,7 @@ editDescription.select('button')
     .on('click', submitDescription);
 
 function renderGraphFromFile(_file) {
-  file = _file;
+  file = _file || 'franklin.json';
   d3.json(file, function (error, _data) {
     data = _data;
     root = '/';
@@ -276,3 +280,8 @@ function handleKeyUp() {
   else if (e == KEYS.p && specialAction == 'createEntry') { specialAction = null; }
   else if (e == KEYS.c && !sourceNode) { specialAction = null; }
 }
+
+franklin.render = renderGraphFromFile;
+this.franklin = franklin;
+
+}();
