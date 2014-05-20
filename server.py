@@ -9,7 +9,9 @@ class SimpleGetPostHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
     length = int(s.headers['Content-Length'])
     data = json.loads(s.rfile.read(length).decode('utf-8'))
     print 'Data received!'
-    with open('franklin.json', 'w') as f:
+    filename = data['__franklin_file_name']
+    del data['__franklin_file_name']
+    with open(filename, 'w') as f:
       json.dump(data, f)
 
     s.send_response(200)

@@ -39,6 +39,7 @@ function renderGraphFromFile(_file) {
   file = _file || 'franklin.json';
   d3.json(file, function (error, _data) {
     data = _data;
+    data.__franklin_file_name = file;
     root = '/';
     createDagre(data[root]);
   });
